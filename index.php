@@ -13,7 +13,6 @@ function get_temperature($location)
     if ($location == "deathvalley") {
         $office_code = "VEF";
         $gridpoints = "61,124";
-        // https://api.weather.gov/gridpoints/VEF/61,124
     } else if ($location == "dallas") {
         $office_code = "FWD";
         $gridpoints = "89,104";
