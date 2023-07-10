@@ -68,4 +68,11 @@ if ($temperature >= 90) {
 <p id="flag-text">Flag color is <?php echo $color ?></p>
 <div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"></div>
 <p id="flag-description"><?php echo $description ?></p>
+<p><?php
+// TODO: Either format this or remove it
+// Currently exists for testing refresh button
+echo date("c");
+?></p>
+<button onclick="window.location.reload()">Refresh</button>
+
 </html>
