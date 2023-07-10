@@ -1,5 +1,8 @@
 <?php
 
+$temperature_cache_filename = "heatindex.txt";
+$max_temperature_age_seconds = 60;
+
 /**
  * Get Heat Index temperature from weather.gov API
  * 
@@ -45,29 +48,35 @@ function get_temperature($location)
     }
 
     // Convert Celsius to Farenheit
-    return ($latest_value * 9 / 5) + 32;
+    $farenheit = ($latest_value * 9/5) + 32;
+
+    // Write heat index temperature to a file to act as a cache
+    global $temperature_cache_filename;
+    file_put_contents($temperature_cache_filename, $farenheit);
+
+    return $farenheit;
 }
 
-// TODO check for local file with cached temperature
-$cached_temperature = null;
+// Read the last fetched temperature from the local file
+$cached_temperature = file_get_contents($temperature_cache_filename);
+$file_mtime = filemtime($temperature_cache_filename);
 $temperature_timestamp = null;
-$location = "sbr";
-if (isset($_GET["location"])) {
-    $location = $_GET["location"];
-}
-if (isset($_GET["nocache"]) || !$cached_temperature) {
-    // Bypass the local cache
+if (
+    isset($_GET["nocache"]) || // Check for URL param
+    !$cached_temperature || // Check if file is missing
+    (time() - $file_mtime > $max_temperature_age_seconds) // Check if file is stale
+) {
+    // Bypass the local cache due to URL param override, missing file, or stale file
+    $location = "sbr";
+    if (isset($_GET["location"])) {
+        $location = $_GET["location"];
+    }
     $temperature = get_temperature($location);
     $temperature_timestamp = date("c");
 } else {
-    // TODO check for local file modification time, set true if >60 seconds ago
-    $cached_temperature_stale = null;
-    if ($cached_temperature_stale) {
-        // TODO write temperature to local file to cache it and reset mtime & temp_timestamp
-    } else {
-        $temperature = $cached_temperature;
-        $temperature_timestamp = date("c"); // TODO make this the file mtime
-    }
+    // Cached file is wtihin freshness threshold, use that value to avoid an API call
+    $temperature = $cached_temperature;
+    $temperature_timestamp = date("c", $file_mtime);
 }
 
 // Figure out the flag color & description
