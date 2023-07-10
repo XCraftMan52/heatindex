@@ -5,11 +5,29 @@
  * 
  * @return temperature in Farenheit
  */
-function get_temperature() {
+function get_temperature($location)
+{
     // TODO add contact email address in the User-Agent per https://www.weather.gov/documentation/services-web-api
     $context = stream_context_create(array("http" => array("user_agent" => "natjamboree23.org")));
     // Harcoded URL based on The Summit lat/long
-    $json = file_get_contents("https://api.weather.gov/gridpoints/RLX/82,50", false, $context);
+    if ($location == "deathvalley") {
+        $office_code = "VEF";
+        $gridpoints = "61,124";
+    } else if ($location == "dallas") {
+        $office_code = "FWD";
+        $gridpoints = "89,104";
+    } else if ($location == "denver") {
+        $office_code = "BOU";
+        $gridpoints = "63,62";
+    } else if ($location == "golden") {
+        $office_code = "BOU";
+        $gridpoints = "55,63";
+    } else {
+        $office_code = "RLX";
+        $gridpoints = "82,50";
+    }
+
+    $json = file_get_contents("https://api.weather.gov/gridpoints/$office_code/$gridpoints", false, $context);
     if (!$json) {
         echo "Failed to access weather.gov API";
         exit;
@@ -27,15 +45,19 @@ function get_temperature() {
     }
 
     // Convert Celsius to Farenheit
-    return ($latest_value * 9/5) + 32;
+    return ($latest_value * 9 / 5) + 32;
 }
 
 // TODO check for local file with cached temperature
 $cached_temperature = null;
 $temperature_timestamp = null;
+$location = "sbr";
+if (isset($_GET["location"])) {
+    $location = $_GET["location"];
+}
 if (isset($_GET["nocache"]) || !$cached_temperature) {
     // Bypass the local cache
-    $temperature = get_temperature();
+    $temperature = get_temperature($location);
     $temperature_timestamp = date("c");
 } else {
     // TODO check for local file modification time, set true if >60 seconds ago
@@ -68,6 +90,11 @@ if ($temperature >= 90) {
 <html>
 <title>Heat Index</title>
 <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
+<?php
+ if($location and $location != "sbr") {
+    echo "<p>Location: $location</p>";
+ }
+?>
 <p id="flag-text">Flag color is <?php echo $color ?></p>
 <div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"></div>
 <p id="flag-description"><?php echo $description ?></p>
