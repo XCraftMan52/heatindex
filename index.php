@@ -32,16 +32,19 @@ function get_temperature() {
 
 // TODO check for local file with cached temperature
 $cached_temperature = null;
+$temperature_timestamp = null;
 if (isset($_GET["nocache"]) || !$cached_temperature) {
     // Bypass the local cache
     $temperature = get_temperature();
+    $temperature_timestamp = date("c");
 } else {
     // TODO check for local file modification time, set true if >60 seconds ago
     $cached_temperature_stale = null;
     if ($cached_temperature_stale) {
-        // TODO write temperature to local file to cache it and reset mtime
+        // TODO write temperature to local file to cache it and reset mtime & temp_timestamp
     } else {
         $temperature = $cached_temperature;
+        $temperature_timestamp = date("c"); // TODO make this the file mtime
     }
 }
 
@@ -71,7 +74,8 @@ if ($temperature >= 90) {
 <p><?php
 // TODO: Either format this or remove it
 // Currently exists for testing refresh button
-echo date("c");
+echo "Heat Index refreshed at: ".$temperature_timestamp."<br>";
+echo "Page refreshed at: ".date("c");
 ?></p>
 <button onclick="window.location.reload()">Refresh</button>
 
