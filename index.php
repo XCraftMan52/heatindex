@@ -51,16 +51,16 @@ if (isset($_GET["nocache"]) || !$cached_temperature) {
 // Figure out the flag color & description
 if ($temperature >= 90) {
     $color = "black";
-    $description = "";
+    $description = "All participants not actively involved in activities should remain under shade. 20 minutes of rest for every 30 minutes of activity. Medical assistance will be called for any person displaying potential signs of heat-related illness. If the Garden Ground trek is underway, frequent water breaks will be taken. Drink at least 1 to 1 1/4 quarts of water per hour.";
 } elseif ($temperature >= 88) {
     $color = "red";
-    $description = "";
+    $description = "15 minutes of rest will be exercised for every 45 minutes of activity. Medical assistance will be called for any person displaying potential signs of heat-related illness. If anyone is hiking, frequent water breaks should be taken. Drink at least 3/4 to 1 full quart of water per hour.";
 } elseif ($temperature >= 85) {
     $color = "yellow";
-    $description = "";
+    $description = "Staff will observe participants and other staff members for signs of dehydration or heat-related illnesses. 10 minutes of rest will be exercised for every 60 minutes of activity. Staff shall monitor anyone displaying signs of dehydration or heat-related illness and call for medical assistance if needed. Drink at least 1/2 to 3/4 quart of water per hour.";
 } else {
     $color = "green";
-    $description = "";
+    $description = "Physical activities will be conducted with caution and under constant supervision. Staff will observe participants and leaders to ensure they are carrying water bottles. Drink at least 1/4 to 1/2 quart of water per hour.";
 }
 
 ?>
