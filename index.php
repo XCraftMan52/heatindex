@@ -96,7 +96,8 @@ if ($temperature >= 90) {
  }
 ?>
 <p id="flag-text">Flag color is <?php echo $color ?></p>
-<div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"></div>
+<div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"
+    aria-label="<?php echo $color ?> flag"></div>
 <p id="flag-description"><?php echo $description ?></p>
 <p><?php
 // TODO: Either format this or remove it
