@@ -1,18 +1,17 @@
 <?php
 
 $temperature_cache_filename = "heatindex.txt";
-$max_temperature_age_seconds = 60;
+$max_temperature_age_seconds = 60; // How stale the Heat Index can be
 
 /**
  * Get Heat Index temperature from weather.gov API
  * 
+ * @param string $location location keyword for debugging
  * @return temperature in Farenheit
  */
-function get_temperature($location)
-{
+function get_temperature($location) {
     // TODO add contact email address in the User-Agent per https://www.weather.gov/documentation/services-web-api
     $context = stream_context_create(array("http" => array("user_agent" => "natjamboree23.org")));
-    // Harcoded URL based on The Summit lat/long
     if ($location == "deathvalley") {
         $office_code = "VEF";
         $gridpoints = "61,124";
@@ -26,6 +25,7 @@ function get_temperature($location)
         $office_code = "BOU";
         $gridpoints = "55,63";
     } else {
+        // Harcoded location based on The Summit lat/long
         $office_code = "RLX";
         $gridpoints = "82,50";
     }
