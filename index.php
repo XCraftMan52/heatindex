@@ -10,6 +10,10 @@ function get_temperature() {
     $context = stream_context_create(array("http" => array("user_agent" => "natjamboree23.org")));
     // Harcoded URL based on The Summit lat/long
     $json = file_get_contents("https://api.weather.gov/gridpoints/RLX/82,50", false, $context);
+    if (!$json) {
+        echo "Failed to access weather.gov API";
+        exit;
+    }
     $decoded = json_decode($json);
 
     // Iterate through the heat index forecast to find the current time window
