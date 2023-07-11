@@ -2,3 +2,4 @@ heatindex.txt
 .DS_Store
 .vscode
 __pycache__
+*.zip
