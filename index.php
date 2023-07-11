@@ -112,7 +112,7 @@ if ($temperature >= 90) {
     <body>
         <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
         <?php
-            if($location and $location != "sbr") {
+            if(isset($location) && $location != "sbr") {
                 echo "<p>Location: $location</p>";
             }
         ?>
