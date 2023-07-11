@@ -120,6 +120,24 @@ if ($temperature >= 90) {
             body {
                 font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             }
+
+            .btn {
+                background-color: #1c407d;
+                border: 2px solid #1c407d;
+                border-radius: 0.375rem;
+                box-shadow: none;
+                color: #ffffff;
+                cursor: pointer;
+                font-size: 1rem;
+                padding: 0.6rem 1rem;
+                transition: all 0.25s;
+            }
+
+            .btn:hover,
+            .btn:active {
+                background-color: #ffffff;
+                color: #1c407d;
+            }
         </style>
     </head>
     <body>
@@ -137,7 +155,7 @@ if ($temperature >= 90) {
             echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
             echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
         ?></p>
-        <button onclick="window.location.reload()">Refresh</button>
+        <button class="btn btn-refresh" onclick="window.location.reload()">Refresh</button>
 
     </body>
 </html>
