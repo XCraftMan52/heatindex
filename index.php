@@ -46,8 +46,6 @@ function get_temperature($location) {
     // Iterate through the heat index forecast to find the current time window
     $latest_value = null;
     foreach ($decoded->properties->heatIndex->values as $heatindex_value) {
-        var_dump($heatindex_value);
-        print_r("<br>");
         if ($dt->setTimestamp($now) < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
             break;
         }
