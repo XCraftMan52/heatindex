@@ -13,7 +13,7 @@ $now = time();
  * @param string $location location keyword for debugging
  * @return temperature in Farenheit
  */
-function get_temperature($location) {
+function get_temperature($location = "sbr") {
     global $dt, $now, $temperature_cache_filename;
 
     // TODO add contact email address in the User-Agent per https://www.weather.gov/documentation/services-web-api
@@ -78,11 +78,12 @@ if (
     ($now - $file_mtime > $max_temperature_age_seconds) // Check if file is stale
 ) {
     // Bypass the local cache due to URL param override, missing file, or stale file
-    $location = "sbr";
     if (isset($_GET["location"])) {
-        $location = $_GET["location"];
+        // Read location for debugging
+        $temperature = get_temperature($_GET["location"]);
+    } else {
+        $temperature = get_temperature();
     }
-    $temperature = get_temperature($location);
     $temperature_timestamp = $dt->setTimestamp($now)->format($datetime_format);
 } else {
     // Cached file is wtihin freshness threshold, use that value to avoid an API call
@@ -145,8 +146,8 @@ if ($temperature >= 90) {
     <body>
         <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
         <?php
-            if(isset($location) && $location != "sbr") {
-                echo "<p>Location: $location</p>";
+            if(isset($_GET["location"])) {
+                echo "<p>Location: " . $_GET["location"] . "</p>";
             }
         ?>
         <p id="flag-text">Flag color is <?php echo $color ?></p>
