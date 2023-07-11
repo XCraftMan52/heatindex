@@ -27,27 +27,64 @@ $description = $color_data[1];
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
-    body {
-        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    }
+        body {
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            margin: 0;
+        }
 
-    .btn {
-        background-color: #1c407d;
-        border: 2px solid #1c407d;
-        border-radius: 0.375rem;
-        box-shadow: none;
-        color: #ffffff;
-        cursor: pointer;
-        font-size: 1rem;
-        padding: 0.6rem 1rem;
-        transition: all 0.25s;
-    }
+        .btn {
+            background-color: #1c407d;
+            border: 2px solid #1c407d;
+            border-radius: 0.375rem;
+            box-shadow: none;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.6rem 1rem;
+            transition: all 0.25s;
+        }
 
-    .btn:hover,
-    .btn:active {
-        background-color: #ffffff;
-        color: #1c407d;
-    }
+        .btn:hover,
+        .btn:active {
+            background-color: #ffffff;
+            color: #1c407d;
+        }
+
+        #heat-index-content,
+        #mandatory-refresh-content {
+            margin: 1rem;
+        }
+
+        #flag-rectangle {
+            height: 160px;
+            margin: -1rem;
+            width: 100vw;
+        }
+
+        #heat-index-content header {
+            background-color: #ffffff;
+            border-radius: 0.375rem;
+            margin-top: -3rem;
+            padding: 0.75rem 1rem;
+            width: calc(100% - 2rem);
+        }
+
+        #heat-index-content header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        @media (min-width: 767px) {
+            #heat-index-content header {
+                max-width: 50vw;
+            }
+        }
+
+        @media (min-width: 992px) {
+            #heat-index-content header {
+                max-width: 30vw;
+            }
+        }
     </style>
 </head>
 
@@ -58,29 +95,31 @@ $description = $color_data[1];
             document.getElementById("heat-index-content").style.display = "none"
         },
         5 * 60 * 1000
-    )
+    );
     </script>
-    <div id="heat-index-content">
-        <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
-        <?php
-            if(isset($_GET["location"])) {
-                echo "<p>Location: " . $_GET["location"] . "</p>";
-            }
-        ?>
-        <p id="flag-text">Flag color is <?php echo $color ?></p>
-        <div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"
-            aria-label="<?php echo $color ?> flag"></div>
+    <section id="heat-index-content">
+        <div id="flag-rectangle" style="background-color:<?php echo $color ?>;"
+                aria-label="<?php echo $color ?> flag"></div>
+        <header>
+            <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg; F</h1>
+            <?php
+                if(isset($_GET["location"])) {
+                    echo "<p>Location: " . $_GET["location"] . "</p>";
+                }
+            ?>
+            <p id="flag-text">Flag color is <?php echo $color ?></p>
+        </header>
         <p id="flag-description"><?php echo $description ?></p>
         <p><?php
             echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
             echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
         ?></p>
         <button class="btn btn-refresh" onclick="window.location.reload()">Refresh</button>
-    </div>
-    <div id="mandatory-refresh-content" style="display: none;">
+    </section>
+    <section id="mandatory-refresh-content" style="display: none;">
         <p>Please <a href="refresh" onclick="window.location.reload()">refresh</a> the page.</p>
         <p>The data that you were previously viewing is more than 5 minutes old.</p>
-    </div>
+    </section>
 </body>
 
 </html>
