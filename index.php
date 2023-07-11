@@ -69,8 +69,8 @@ function get_temperature($location = "sbr") {
 }
 
 // Read the last fetched temperature from the local file
-$cached_temperature = file_get_contents($temperature_cache_filename);
-$file_mtime = filemtime($temperature_cache_filename);
+$cached_temperature = file_exists($temperature_cache_filename) ? file_get_contents($temperature_cache_filename) : null;
+$file_mtime = file_exists($temperature_cache_filename) ? filemtime($temperature_cache_filename) : null;
 $temperature_timestamp = null;
 if (
     isset($_GET["nocache"]) || // Check for URL param
@@ -110,40 +110,51 @@ if ($temperature >= 90) {
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Heat Index</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
-        <style>
-            body {
-                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-            }
+<head>
+    <title>Heat Index</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-            .btn {
-                background-color: #1c407d;
-                border: 2px solid #1c407d;
-                border-radius: 0.375rem;
-                box-shadow: none;
-                color: #ffffff;
-                cursor: pointer;
-                font-size: 1rem;
-                padding: 0.6rem 1rem;
-                transition: all 0.25s;
-            }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-            .btn:hover,
-            .btn:active {
-                background-color: #ffffff;
-                color: #1c407d;
-            }
-        </style>
-    </head>
-    <body>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+    body {
+        font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    }
+
+    .btn {
+        background-color: #1c407d;
+        border: 2px solid #1c407d;
+        border-radius: 0.375rem;
+        box-shadow: none;
+        color: #ffffff;
+        cursor: pointer;
+        font-size: 1rem;
+        padding: 0.6rem 1rem;
+        transition: all 0.25s;
+    }
+
+    .btn:hover,
+    .btn:active {
+        background-color: #ffffff;
+        color: #1c407d;
+    }
+    </style>
+</head>
+
+<body>
+    <script>
+    setTimeout(() => {
+            document.getElementById("mandatory-refresh-content").style.display = "block"
+            document.getElementById("heat-index-content").style.display = "none"
+        },
+        5 * 60 * 1000
+    )
+    </script>
+    <div id="heat-index-content">
         <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
         <?php
             if(isset($_GET["location"])) {
@@ -159,6 +170,11 @@ if ($temperature >= 90) {
             echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
         ?></p>
         <button class="btn btn-refresh" onclick="window.location.reload()">Refresh</button>
+    </div>
+    <div id="mandatory-refresh-content" style="display: none;">
+        <p>Please <a href="refresh" onclick="window.location.reload()">refresh</a> the page.</p>
+        <p>The data that you were previously viewing is more than 5 minutes old.</p>
+    </div>
+</body>
 
-    </body>
 </html>
