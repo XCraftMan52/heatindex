@@ -96,24 +96,37 @@ if ($temperature >= 90) {
 
 ?>
 
+<!DOCTYPE html>
 <html>
-<title>Heat Index</title>
-<h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
-<?php
- if($location and $location != "sbr") {
-    echo "<p>Location: $location</p>";
- }
-?>
-<p id="flag-text">Flag color is <?php echo $color ?></p>
-<div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"
-    aria-label="<?php echo $color ?> flag"></div>
-<p id="flag-description"><?php echo $description ?></p>
-<p><?php
-// TODO: Either format this or remove it
-// Currently exists for testing refresh button
-echo "Heat Index refreshed at: ".$temperature_timestamp."<br>";
-echo "Page refreshed at: ".date("c");
-?></p>
-<button onclick="window.location.reload()">Refresh</button>
+    <head>
+        <title>Heat Index</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg F</h1>
+        <?php
+            if($location and $location != "sbr") {
+                echo "<p>Location: $location</p>";
+            }
+        ?>
+        <p id="flag-text">Flag color is <?php echo $color ?></p>
+        <div id="flag-rectangle" style="width:300px;height:100px;background-color:<?php echo $color ?>;"
+            aria-label="<?php echo $color ?> flag"></div>
+        <p id="flag-description"><?php echo $description ?></p>
+        <p><?php
+        // TODO: Either format this or remove it
+        // Currently exists for testing refresh button
+        echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
+        echo "Page refreshed at: " . date("c");
+        ?></p>
+        <button onclick="window.location.reload()">Refresh</button>
 
+    </body>
 </html>
