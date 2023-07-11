@@ -44,7 +44,14 @@ function get_temperature($location) {
         if ($now < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
             break;
         }
-        $latest_value = $heatindex_value->value;
+        if ($heatindex_value->value != null) {
+            $latest_value = $heatindex_value->value;
+        } // If the value is null, fall back to the last value
+    }
+
+    if ($latest_value == null) {
+        echo "All null values received from weather.gov API";
+        exit;
     }
 
     // Convert Celsius to Farenheit
