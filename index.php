@@ -98,18 +98,18 @@ $description = $color_data[1];
     );
     </script>
     <section id="heat-index-content">
-        <div id="flag-rectangle" style="background-color:<?php echo $color ?>;"
-                aria-label="<?php echo $color ?> flag"></div>
+        <div id="flag-rectangle" style="background-color:<?= $color ?>;"
+                aria-label="<?= $color ?> flag"></div>
         <header>
-            <h1 id="heading">Heat Index is <?php echo $temperature ?>&deg; F</h1>
+            <h1 id="heading">Heat Index is <?= $temperature ?>&deg; F</h1>
             <?php
                 if(isset($_GET["location"])) {
                     echo "<p>Location: " . $_GET["location"] . "</p>";
                 }
             ?>
-            <p id="flag-text">Flag color is <?php echo $color ?></p>
+            <p id="flag-text">Flag Color: <?= ucfirst($color) ?></p>
         </header>
-        <p id="flag-description"><?php echo $description ?></p>
+        <p id="flag-description"><?= $description ?></p>
         <p><?php
             echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
             echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
