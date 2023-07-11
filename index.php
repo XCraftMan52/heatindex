@@ -2,6 +2,10 @@
 
 $temperature_cache_filename = "heatindex.txt";
 $max_temperature_age_seconds = 60; // How stale the Heat Index can be
+$dt = new DateTime();
+$dt->setTimezone(new DateTimeZone("America/New_York"));
+$datetime_format = "D, M j, G:i:s T";
+$now = time();
 
 /**
  * Get Heat Index temperature from weather.gov API
@@ -10,6 +14,8 @@ $max_temperature_age_seconds = 60; // How stale the Heat Index can be
  * @return temperature in Farenheit
  */
 function get_temperature($location) {
+    global $dt, $now, $temperature_cache_filename;
+
     // TODO add contact email address in the User-Agent per https://www.weather.gov/documentation/services-web-api
     $context = stream_context_create(array("http" => array("user_agent" => "natjamboree23.org")));
     if ($location == "deathvalley") {
@@ -38,10 +44,11 @@ function get_temperature($location) {
     $decoded = json_decode($json);
 
     // Iterate through the heat index forecast to find the current time window
-    $now = new DateTime();
     $latest_value = null;
     foreach ($decoded->properties->heatIndex->values as $heatindex_value) {
-        if ($now < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
+        var_dump($heatindex_value);
+        print_r("<br>");
+        if ($dt->setTimestamp($now) < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
             break;
         }
         if ($heatindex_value->value != null) {
@@ -58,7 +65,6 @@ function get_temperature($location) {
     $farenheit = ($latest_value * 9/5) + 32;
 
     // Write heat index temperature to a file to act as a cache
-    global $temperature_cache_filename;
     file_put_contents($temperature_cache_filename, $farenheit);
 
     return $farenheit;
@@ -71,7 +77,7 @@ $temperature_timestamp = null;
 if (
     isset($_GET["nocache"]) || // Check for URL param
     !$cached_temperature || // Check if file is missing
-    (time() - $file_mtime > $max_temperature_age_seconds) // Check if file is stale
+    ($now - $file_mtime > $max_temperature_age_seconds) // Check if file is stale
 ) {
     // Bypass the local cache due to URL param override, missing file, or stale file
     $location = "sbr";
@@ -79,11 +85,11 @@ if (
         $location = $_GET["location"];
     }
     $temperature = get_temperature($location);
-    $temperature_timestamp = date("c");
+    $temperature_timestamp = $dt->setTimestamp($now)->format($datetime_format);
 } else {
     // Cached file is wtihin freshness threshold, use that value to avoid an API call
     $temperature = $cached_temperature;
-    $temperature_timestamp = date("c", $file_mtime);
+    $temperature_timestamp = $dt->setTimestamp($file_mtime)->format($datetime_format);
 }
 
 // Figure out the flag color & description
@@ -128,10 +134,8 @@ if ($temperature >= 90) {
             aria-label="<?php echo $color ?> flag"></div>
         <p id="flag-description"><?php echo $description ?></p>
         <p><?php
-        // TODO: Either format this or remove it
-        // Currently exists for testing refresh button
-        echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
-        echo "Page refreshed at: " . date("c");
+            echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
+            echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
         ?></p>
         <button onclick="window.location.reload()">Refresh</button>
 
