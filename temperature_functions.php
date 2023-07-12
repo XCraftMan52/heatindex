@@ -16,8 +16,8 @@ $now = time();
 function get_temperature($location = "sbr") {
     global $dt, $now, $temperature_cache_filename;
 
-    // TODO add contact email address in the User-Agent per https://www.weather.gov/documentation/services-web-api
-    $context = stream_context_create(array("http" => array("user_agent" => "natjamboree23.org")));
+    // User-Agent constructed per https://www.weather.gov/documentation/services-web-api
+    $context = stream_context_create(array("http" => array("user_agent" => "(natjamboree23.org, app@natjamboree23.org)")));
     if ($location == "deathvalley") {
         $office_code = "VEF";
         $gridpoints = "61,124";
