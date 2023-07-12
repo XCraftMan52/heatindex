@@ -1,6 +1,6 @@
 <?php
 
-$temperature_cache_filename = "heatindex.txt";
+$temperature_cache_filename = "./heatindex.txt";
 $max_temperature_age_seconds = 60; // How stale the Heat Index can be
 $dt = new DateTime();
 $dt->setTimezone(new DateTimeZone("America/New_York"));
@@ -39,6 +39,7 @@ function get_temperature($location = "sbr") {
     $json = file_get_contents("https://api.weather.gov/gridpoints/$office_code/$gridpoints", false, $context);
     if (!$json) {
         echo "Failed to access weather.gov API";
+        http_response_code(500);
         exit;
     }
     $decoded = json_decode($json);
@@ -56,6 +57,7 @@ function get_temperature($location = "sbr") {
 
     if ($latest_value == null) {
         echo "All null values received from weather.gov API";
+        http_response_code(500);
         exit;
     }
 
@@ -72,6 +74,12 @@ function get_temperature($location = "sbr") {
 
 function get_cached_temp_and_timestamp() {
     global $dt, $now, $temperature_cache_filename, $max_temperature_age_seconds, $datetime_format;
+    if (isset($_GET["nocache"])) {
+        header("Cache-Control: no-cache");
+    } else {
+        header("Cache-Control: max-age=60");
+    }
+
     // Read the last fetched temperature from the local file
     $cached_temperature = file_exists($temperature_cache_filename) ? file_get_contents($temperature_cache_filename) : null;
     $file_mtime = file_exists($temperature_cache_filename) ? filemtime($temperature_cache_filename) : null;
