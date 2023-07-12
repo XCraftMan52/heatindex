@@ -101,8 +101,8 @@ $description = $color_data[1];
             <p id="flag-text">Flag Color: <?= ucfirst($color) ?></p>
             <p id="flag-description"><?= $description ?></p>
             <p><?php
-                echo "Heat Index refreshed at: " . $temperature_timestamp . "<br>";
-                echo "Page refreshed at: " . $dt->setTimestamp($now)->format($datetime_format);
+                echo "<strong>Heat Index refreshed:</strong> " . $temperature_timestamp . "<br>";
+                echo "<strong>Page refreshed:</strong> " . $dt->setTimestamp($now)->format($datetime_format);
             ?></p>
             <button class="btn btn-lg btn-primary mt-3" onclick="window.location.reload()">Refresh</button>
         </article>
