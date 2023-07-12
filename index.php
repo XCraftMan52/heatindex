@@ -117,7 +117,7 @@ $description = $color_data[1];
         <button class="btn btn-refresh" onclick="window.location.reload()">Refresh</button>
     </section>
     <section id="mandatory-refresh-content" style="display: none;">
-        <p>Please <a href="refresh" onclick="window.location.reload()">refresh</a> the page.</p>
+        <p>Please <a href="" onclick="window.location.reload()">refresh</a> the page.</p>
         <p>The data that you were previously viewing is more than 5 minutes old.</p>
     </section>
 </body>

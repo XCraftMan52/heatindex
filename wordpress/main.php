@@ -57,7 +57,7 @@ function add_heat_index()
 	$data .= '<button class="btn btn-refresh" onclick="window.location.reload()">Refresh</button>';
 	$data .= '</div>';
 	$data .= '<div id="mandatory-refresh-content" style="display: none;">';
-	$data .= '<p>Please <a href="refresh" onclick="window.location.reload()">refresh</a> the page.</p>';
+	$data .= '<p>Please <a href="" onclick="window.location.reload()">refresh</a> the page.</p>';
 	$data .= '<p>The data that you were previously viewing is more than 5 minutes old.</p>';
 	$data .= '</div>';
 
