@@ -3,4 +3,5 @@ heatindex.txt
 .vscode
 __pycache__
 *.zip
+secrets.php
 heatindex.html
