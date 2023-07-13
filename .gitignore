@@ -5,3 +5,4 @@ __pycache__
 *.zip
 secrets.php
 heatindex.html
+testdata.csv
