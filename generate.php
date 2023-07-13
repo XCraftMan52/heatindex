@@ -25,6 +25,34 @@ if($data == false) {
 header("Location: heatindex.html");
 http_response_code(302);
 
-file_put_contents("./heatindex.html", $data);
+// https://stackoverflow.com/a/48123642
+function minify_html($html)
+{
+   $search = array(
+    '/(\n|^)(\x20+|\t)/',
+    '/(\n|^)\/\/(.*?)(\n|$)/',
+    '/\n/',
+    '/\<\!--.*?-->/',
+    '/(\x20+|\t)/', # Delete multispace (Without \n)
+    '/\>\s+\</', # strip whitespaces between tags
+    '/(\"|\')\s+\>/', # strip whitespaces between quotation ("') and end tags
+    '/=\s+(\"|\')/'); # strip whitespaces between = "'
+
+   $replace = array(
+    "\n",
+    "\n",
+    " ",
+    "",
+    " ",
+    "><",
+    "$1>",
+    "=$1");
+
+    $html = preg_replace($search,$replace,$html);
+    return $html;
+}
+
+// Write a minified version to heatindex.html
+file_put_contents("./heatindex.html", minify_html($data));
 
 echo "Data output, redirecting";
