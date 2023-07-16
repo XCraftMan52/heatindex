@@ -1,7 +1,7 @@
 <?php
 
 $temperature_cache_filename = "./heatindex.txt";
-$max_temperature_age_seconds = 60; // How stale the Heat Index can be
+$max_temperature_age_seconds = 600; // How stale the Heat Index can be
 $dt = new DateTime();
 $dt->setTimezone(new DateTimeZone("America/New_York"));
 $datetime_format = "D, M j, g:i A T";
