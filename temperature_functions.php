@@ -6,6 +6,7 @@ $dt = new DateTime();
 $dt->setTimezone(new DateTimeZone("America/New_York"));
 $datetime_format = "D, M j, g:i A T";
 $now = time();
+$api_error_message = null;
 
 /**
  * Get Heat Index temperature from weather.gov API
@@ -14,7 +15,7 @@ $now = time();
  * @return temperature in Farenheit
  */
 function get_temperature($location = "sbr") {
-    global $dt, $now, $temperature_cache_filename;
+    global $dt, $now, $temperature_cache_filename, $api_error_message;
 
     // User-Agent constructed per https://www.weather.gov/documentation/services-web-api
     $context = stream_context_create(array("http" => array("user_agent" => "(natjamboree23.org, app@natjamboree23.org)")));
@@ -38,9 +39,9 @@ function get_temperature($location = "sbr") {
 
     $json = file_get_contents("https://api.weather.gov/gridpoints/$office_code/$gridpoints", false, $context);
     if (!$json) {
-        echo "Failed to access weather.gov API";
+        $api_error_message = "Failed to access weather.gov API - please refresh in a few minutes.";
         http_response_code(500);
-        exit;
+        return null;
     }
     $decoded = json_decode($json);
 
@@ -56,9 +57,9 @@ function get_temperature($location = "sbr") {
     }
 
     if ($latest_value == null) {
-        echo "All null values received from weather.gov API";
+        $api_error_message = "All null values received from weather.gov API - please refresh in a few minutes.";
         http_response_code(500);
-        exit;
+        return null;
     }
 
     // Convert Celsius to Farenheit
@@ -107,8 +108,13 @@ function get_cached_temp_and_timestamp() {
 }
 
 function get_color_and_description($temperature) {
+    global $api_error_message;
+
     // Figure out the flag color & description
-    if ($temperature >= 90) {
+    if ($temperature == null) {
+        $color = "";
+        $description = $api_error_message;
+    } elseif ($temperature >= 90) {
         $color = "black";
         $description = "All participants not actively involved in activities should remain under shade. 20 minutes of rest for every 30 minutes of activity. Medical assistance will be called for any person displaying potential signs of heat-related illness. If the Garden Ground trek is underway, frequent water breaks will be taken. Drink at least 1 to 1 1/4 quarts of water per hour.";
     } elseif ($temperature >= 88) {
