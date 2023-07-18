@@ -2,11 +2,12 @@
 
 $temperature_cache_filename = "./heatindex.txt";
 $max_temperature_age_seconds = 600; // How stale the Heat Index can be
+$max_null_age_seconds = 60; // How stale the null-cached Heat Index can be
 $dt = new DateTime();
 $dt->setTimezone(new DateTimeZone("America/New_York"));
 $datetime_format = "D, M j, g:i A T";
 $now = time();
-$api_error_message = null;
+$api_error_message = null; // Our own error message to be displayed on the frontend
 
 /**
  * Get Heat Index temperature from weather.gov API
@@ -16,6 +17,8 @@ $api_error_message = null;
  */
 function get_temperature($location = "sbr") {
     global $dt, $now, $temperature_cache_filename, $api_error_message;
+
+    $latest_value = null; // Initial value, default if the API misbehaves
 
     // User-Agent constructed per https://www.weather.gov/documentation/services-web-api
     $context = stream_context_create(array("http" => array("user_agent" => "(natjamboree23.org, app@natjamboree23.org)")));
@@ -41,12 +44,10 @@ function get_temperature($location = "sbr") {
     if (!$json) {
         $api_error_message = "Failed to access weather.gov API - please refresh in a few minutes.";
         http_response_code(500);
-        return null;
     }
     $decoded = json_decode($json);
 
     // Iterate through the heat index forecast to find the current time window
-    $latest_value = null;
     foreach ($decoded->properties->heatIndex->values as $heatindex_value) {
         if ($dt->setTimestamp($now) < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
             break;
@@ -59,11 +60,17 @@ function get_temperature($location = "sbr") {
     if ($latest_value == null) {
         $api_error_message = "All null values received from weather.gov API - please refresh in a few minutes.";
         http_response_code(500);
-        return null;
     }
 
-    // Convert Celsius to Farenheit
-    $farenheit = ($latest_value * 9/5) + 32;
+    if ($latest_value != null) {
+        // Convert Celsius to Farenheit
+        $farenheit = ($latest_value * 9/5) + 32;
+    } else {
+        // Cache a special string to indicate recent fetches were null
+        $farenheit = "null";
+        $api_error_message = "Null cache from weather.gov API - please refresh in a few minutes.";
+        http_response_code(500);
+    }
 
     // Write heat index temperature to a file to act as a cache
     file_put_contents($temperature_cache_filename, $farenheit);
@@ -74,7 +81,7 @@ function get_temperature($location = "sbr") {
 
 
 function get_cached_temp_and_timestamp() {
-    global $dt, $now, $temperature_cache_filename, $max_temperature_age_seconds, $datetime_format;
+    global $dt, $now, $temperature_cache_filename, $max_temperature_age_seconds, $max_null_age_seconds, $datetime_format, $api_error_message;
     if (isset($_GET["nocache"])) {
         header("Cache-Control: no-cache");
     } else {
@@ -88,7 +95,8 @@ function get_cached_temp_and_timestamp() {
     if (
         isset($_GET["nocache"]) || // Check for URL param
         !$cached_temperature || // Check if file is missing
-        ($now - $file_mtime > $max_temperature_age_seconds) // Check if file is stale
+        ($now - $file_mtime > $max_temperature_age_seconds) || // Check if file is stale
+        ($cached_temperature == "null" && ($now - $file_mtime > $max_null_age_seconds)) // Check if null-cached file is stale
     ) {
         // Bypass the local cache due to URL param override, missing file, or stale file
         if (isset($_GET["location"])) {
@@ -99,9 +107,16 @@ function get_cached_temp_and_timestamp() {
         }
         $temperature_timestamp = $dt->setTimestamp($now)->format($datetime_format);
     } else {
-        // Cached file is wtihin freshness threshold, use that value to avoid an API call
+        // Cached file is within freshness threshold, use that value to avoid an API call
         $temperature = $cached_temperature;
         $temperature_timestamp = $dt->setTimestamp($file_mtime)->format($datetime_format);
+    }
+
+    // Special value when the cached file contains "null" for caching an API error
+    if ($temperature == "null") {
+        $temperature = null;
+        $api_error_message = "Null cache from weather.gov API - please refresh in a few minutes.";
+        http_response_code(500);
     }
 
     return array($temperature, $temperature_timestamp);
