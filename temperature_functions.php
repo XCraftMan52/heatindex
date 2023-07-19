@@ -134,7 +134,7 @@ function get_color_and_description($temperature) {
     }
 
     // Figure out the flag color & description
-    if ($temperature == null) {
+    if ($temperature == null && $override_color == null) {
         $color = "";
         $description = $api_error_message;
     } elseif ($temperature >= 90 || $override_color == "black") {
