@@ -137,13 +137,13 @@ function get_color_and_description($temperature) {
     if ($temperature == null && $override_color == null) {
         $color = "";
         $description = $api_error_message;
-    } elseif ($temperature >= 90 || $override_color == "black") {
+    } elseif (($override_color == null && $temperature >= 90) || $override_color == "black") {
         $color = "black";
         $description = "All participants not actively involved in activities should remain under shade. 20 minutes of rest for every 30 minutes of activity. Medical assistance will be called for any person displaying potential signs of heat-related illness. If the Garden Ground trek is underway, frequent water breaks will be taken. Drink at least 1 to 1 1/4 quarts of water per hour.";
-    } elseif ($temperature >= 88 || $override_color == "red") {
+    } elseif (($override_color == null && $temperature >= 88) || $override_color == "red") {
         $color = "red";
         $description = "15 minutes of rest will be exercised for every 45 minutes of activity. Medical assistance will be called for any person displaying potential signs of heat-related illness. If anyone is hiking, frequent water breaks should be taken. Drink at least 3/4 to 1 full quart of water per hour.";
-    } elseif ($temperature >= 85 || $override_color == "yellow") {
+    } elseif (($override_color == null && $temperature >= 85) || $override_color == "yellow") {
         $color = "yellow";
         $description = "Staff will observe participants and other staff members for signs of dehydration or heat-related illnesses. 10 minutes of rest will be exercised for every 60 minutes of activity. Staff shall monitor anyone displaying signs of dehydration or heat-related illness and call for medical assistance if needed. Drink at least 1/2 to 3/4 quart of water per hour.";
     } else {
