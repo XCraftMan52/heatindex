@@ -37,7 +37,7 @@ function get_temperature($location = "sbr") {
     } else {
         // Harcoded location based on The Summit lat/long
         $office_code = "RLX";
-        $gridpoints = "82,50";
+        $gridpoints = "82,49";
     }
 
     $json = file_get_contents("https://api.weather.gov/gridpoints/$office_code/$gridpoints", false, $context);
