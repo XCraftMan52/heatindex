@@ -5,7 +5,7 @@ $max_temperature_age_seconds = 600; // How stale the Heat Index can be
 $max_null_age_seconds = 60; // How stale the null-cached Heat Index can be
 $dt = new DateTime();
 $dt->setTimezone(new DateTimeZone("America/New_York"));
-$datetime_format = "D, M j, g:i A T";
+$datetime_format = "D, M j, g:i:s A T";
 $now = time();
 $api_error_message = null; // Our own error message to be displayed on the frontend
 
