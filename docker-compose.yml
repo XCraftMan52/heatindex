@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: heatindex-web
+    ports:
+      - "8080:80"
+    environment:
+      - GENERATION_KEY=test-secret-key-12345
+      # Optional: default location for the weather.gov query.
+      # Supported: sbr, deathvalley, dallas, denver, golden
+      - WEATHER_LOCATION=sbr
+    restart: unless-stopped

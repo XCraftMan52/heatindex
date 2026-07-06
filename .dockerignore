@@ -1,0 +1,14 @@
+.git
+.gitignore
+.vscode
+.dockerignore
+wordpress
+test
+secrets.php
+heatindex.txt
+heatindex.html
+override_color.txt
+testdata.csv
+docker-compose.yml
+Dockerfile
+README.md
