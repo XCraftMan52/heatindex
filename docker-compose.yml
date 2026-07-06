@@ -2,15 +2,16 @@ version: '3.8'
 
 services:
   web:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: heatindex-web
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: ghcr.io/XCraftMan52/heatindex:latest
+    container_name: heatindex
     ports:
       - "8080:80"
     environment:
       - GENERATION_KEY=test-secret-key-12345
       # Optional: default location for the weather.gov query.
       # Supported: sbr, deathvalley, dallas, denver, golden
-      - WEATHER_LOCATION=sbr
+      - WEATHER_LOCATION=SBR
     restart: unless-stopped

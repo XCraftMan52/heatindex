@@ -1,8 +1,12 @@
 <?php
-
 require("./temperature_functions.php");
 
-$data = get_cached_temp_and_timestamp();
+// Establish the page-level variables explicitly here
+$default_location = getenv("WEATHER_LOCATION") ?: "SBR";
+$current_location = isset($_GET["location"]) ? strtolower($_GET["location"]) : $default_location;
+
+// Pass the clear location string into the caching engine
+$data = get_cached_temp_and_timestamp($current_location);
 
 $temperature = $data[0];
 $temperature_timestamp = $data[1];
@@ -87,7 +91,7 @@ switch ($color) {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Heat Index Safety Dashboard</title>
+    <title>Heat Index</title>
     
     <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -440,9 +444,12 @@ switch ($color) {
         <!-- Main Dashboard Card -->
         <section id="heat-index-content" class="dashboard-card">
             <header class="app-header">
-                <span class="system-tag">Heat Index Safety System</span>
+                <span class="system-tag">Heat Index</span>
                 <?php if(isset($_GET["location"])): ?>
-                    <p class="location-info">Query location: <?= htmlspecialchars(ucfirst($_GET["location"])) ?></p>
+                    <p class="location-info">Location Override: <?= htmlspecialchars(ucfirst($_GET["location"])) ?></p>
+                <?php endif; ?>
+                <?php if(isset($_GET["flag"]) || isset($_GET["override"])): ?>
+                    <p class="location-info">Color Override: <?= htmlspecialchars(ucfirst($_GET["override"] ?? $_GET["flag"])) ?></p>
                 <?php endif; ?>
             </header>
 
@@ -477,7 +484,7 @@ switch ($color) {
 
             <div class="timestamp-section">
                 <div class="timestamp-row">
-                    <span class="timestamp-label">Weather.gov Refreshed:</span>
+                    <span class="timestamp-label">Heat Index Refreshed:</span>
                     <span class="timestamp-value"><?= htmlspecialchars($temperature_timestamp ?: 'N/A') ?></span>
                 </div>
                 <div class="timestamp-row">
