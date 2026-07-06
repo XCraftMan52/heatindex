@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ghcr.io/XCraftMan52/heatindex
+  IMAGE: ghcr.io/xcraftman52/heatindex
 
 jobs:
   build-and-push:
