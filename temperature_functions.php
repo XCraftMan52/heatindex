@@ -1,59 +1,165 @@
 <?php
 
+// function get_temperature($location) {
+//     // Moved inside: Configures ONLY this API fetch
+//     $default_location = getenv("WEATHER_LOCATION") ?: "SBR";
+//     $temperature_cache_filename = ($location === "SBR") ? __DIR__ . "/heatindex.txt" : __DIR__ . "/heatindex_" . preg_replace('/[^a-z0-9_-]/', '', $location) . ".txt";
+
+//     if ($location == "deathvalley") {
+//         $office_code = "VEF"; $gridpoints = "61,124";
+//     } else if ($location == "dallas") {
+//         $office_code = "FWD"; $gridpoints = "89,104";
+//     } else if ($location == "denver") {
+//         $office_code = "BOU"; $gridpoints = "63,62";
+//     } else if ($location == "golden") {
+//         $office_code = "BOU"; $gridpoints = "55,63";
+//     } else {
+//         $office_code = "RLX"; $gridpoints = "82,49";
+//     }
+
+//     $ch = curl_init();
+//     curl_setopt($ch, CURLOPT_URL, "https://api.weather.gov/gridpoints/$office_code/$gridpoints");
+//     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+//     curl_setopt($ch, CURLOPT_USERAGENT, "(natjamboree23.org, app@natjamboree23.org)");
+//     curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+//     curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+    
+//     $json = curl_exec($ch);
+//     curl_close($ch);
+
+//     if ($json === false || empty($json)) {
+//         return "null";
+//     }
+    
+//     $decoded = json_decode($json);
+//     if (!isset($decoded->properties->heatIndex->values)) {
+//         return "null";
+//     }
+
+//     $dt = new DateTime("now", new DateTimeZone("America/New_York"));
+//     $now = time();
+
+//     foreach ($decoded->properties->heatIndex->values as $heatindex_value) {
+//         if ($dt->setTimestamp($now) < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
+//             break;
+//         }
+//         if ($heatindex_value->value != null) {
+//             $latest_value = $heatindex_value->value;
+//         }
+//     }
+
+//     $farenheit = ($latest_value != null) ? (($latest_value * 9/5) + 32) : "null";
+
+//     file_put_contents($temperature_cache_filename, $farenheit);
+//     return $farenheit;
+// }
+
 function get_temperature($location) {
-    // Moved inside: Configures ONLY this API fetch
-    $default_location = getenv("WEATHER_LOCATION") ?: "SBR";
-    $temperature_cache_filename = ($location === "SBR") ? __DIR__ . "/heatindex.txt" : __DIR__ . "/heatindex_" . preg_replace('/[^a-z0-9_-]/', '', $location) . ".txt";
+// Moved inside: Configures ONLY this API fetch
+$default_location = getenv("WEATHER_LOCATION") ?: "SBR";
+$temperature_cache_filename = ($location === "SBR")
+    ? __DIR__ . "/heatindex.txt"
+    : __DIR__ . "/heatindex_" . preg_replace('/[^a-z0-9_-]/', '', $location) . ".txt";
+$url = "https://wvdhsem.onerain.com/sensor/?site_id=1403&site=8b2bc91e-7a23-4829-a6af-b03f8247980a&device_id=10&device=329bb8d4-1972-4c12-9587-7f7f90b046aa";
 
-    if ($location == "deathvalley") {
-        $office_code = "VEF"; $gridpoints = "61,124";
-    } else if ($location == "dallas") {
-        $office_code = "FWD"; $gridpoints = "89,104";
-    } else if ($location == "denver") {
-        $office_code = "BOU"; $gridpoints = "63,62";
-    } else if ($location == "golden") {
-        $office_code = "BOU"; $gridpoints = "55,63";
-    } else {
-        $office_code = "RLX"; $gridpoints = "82,49";
-    }
-
+$cookieFile = __DIR__ . "/cookies.txt";
+function get_new_onerain_cookie($url, $cookieFile) {
+    // Generate a new session cookie
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, "https://api.weather.gov/gridpoints/$office_code/$gridpoints");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_USERAGENT, "(natjamboree23.org, app@natjamboree23.org)");
-    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_COOKIEJAR => $cookieFile,
+        CURLOPT_USERAGENT => "Mozilla/5.0",
+    ]);
+
+    curl_exec($ch);
     
-    $json = curl_exec($ch);
-    curl_close($ch);
 
-    if ($json === false || empty($json)) {
-        return "null";
-    }
-    
-    $decoded = json_decode($json);
-    if (!isset($decoded->properties->heatIndex->values)) {
-        return "null";
-    }
+    // Read generated cookie file
+    if (file_exists($cookieFile)) {
+        $cookies = file($cookieFile);
 
-    $dt = new DateTime("now", new DateTimeZone("America/New_York"));
-    $now = time();
-
-    foreach ($decoded->properties->heatIndex->values as $heatindex_value) {
-        if ($dt->setTimestamp($now) < DateTime::createFromFormat("Y-m-d\TH:i:s+", $heatindex_value->validTime)) {
-            break;
-        }
-        if ($heatindex_value->value != null) {
-            $latest_value = $heatindex_value->value;
+        foreach ($cookies as $line) {
+            if (strpos($line, "WEBAPP_SESSION") !== false) {
+                $parts = explode("\t", trim($line));
+                return end($parts);
+            }
         }
     }
 
-    $farenheit = ($latest_value != null) ? (($latest_value * 9/5) + 32) : "null";
-
-    file_put_contents($temperature_cache_filename, $farenheit);
-    return $farenheit;
+    return null;
 }
 
+
+function fetch_onerain($url, $cookie) {
+    $ch = curl_init();
+
+    curl_setopt_array($ch, [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+
+        CURLOPT_HTTPHEADER => [
+            "Cookie: WEBAPP_SESSION=" . $cookie
+        ],
+
+        CURLOPT_USERAGENT => "Mozilla/5.0",
+
+        CURLOPT_FOLLOWLOCATION => false,
+    ]);
+
+    $response = curl_exec($ch);
+
+    $info = [
+        "response" => $response,
+        "code" => curl_getinfo($ch, CURLINFO_HTTP_CODE),
+        "redirect" => curl_getinfo($ch, CURLINFO_REDIRECT_URL)
+    ];
+
+  
+
+    return $info;
+}
+
+
+// First attempt (your existing cookie)
+$cookie = "e4ho467t3214on5hops2kg4hc7";
+
+$result = fetch_onerain($url, $cookie);
+
+
+// If expired, generate a new one and retry
+if (
+    $result["code"] == 302 &&
+    str_contains($result["redirect"], "/login")
+) {
+
+    $cookie = get_new_onerain_cookie($url, $cookieFile);
+
+    if ($cookie !== null) {
+        $result = fetch_onerain($url, $cookie);
+    }
+}
+
+
+$response = $result["response"];
+
+// Extract the CURRENT heat index (the top card)
+if (preg_match(
+    '/icon-time.*?<h4 class="mb-0">\s*([\d.]+)\s*F\s*<\/h4>/s',
+    $response,
+    $matches
+)) {
+    $fahrenheit = (float)$matches[1];
+
+    file_put_contents($temperature_cache_filename, $fahrenheit);
+
+    return $fahrenheit;
+}
+
+return "null";
+}
 function get_cached_temp_and_timestamp($location) {
     // Moved inside: Configures ONLY the cache thresholds
     $max_temperature_age_seconds = 600;
